@@ -1,0 +1,71 @@
+# test_sos_game.py
+
+import unittest
+from sos_game import SOSGameLogic
+
+class TestSOSGameLogic(unittest.TestCase):
+    def setUp(self):
+        self.game = SOSGameLogic(5)  # Use a 5x5 board for testing
+
+    def test_initial_game_state(self):
+        self.assertEqual(self.game.current_player, "Blue")
+        self.assertFalse(self.game.game_over)
+        self.assertEqual(self.game.blue_score, 0)
+        self.assertEqual(self.game.red_score, 0)
+
+    def test_place_letter(self):
+        self.assertTrue(self.game.place_letter(0, 0, 'S'))
+        self.assertEqual(self.game.board[0][0], 'S')
+        self.assertEqual(self.game.current_player, "Red")
+
+    def test_invalid_move(self):
+        self.game.place_letter(0, 0, 'S')
+        self.assertFalse(self.game.place_letter(0, 0, 'O'))
+
+    def test_check_sos_horizontal(self):
+        self.game.place_letter(0, 0, 'S')
+        self.game.place_letter(0, 1, 'O')
+        self.game.place_letter(0, 2, 'S')
+        self.assertTrue(self.game.check_sos(0, 1))
+
+    def test_check_sos_vertical(self):
+        self.game.place_letter(0, 0, 'S')
+        self.game.place_letter(1, 0, 'O')
+        self.game.place_letter(2, 0, 'S')
+        self.assertTrue(self.game.check_sos(1, 0))
+
+    def test_check_sos_diagonal(self):
+        self.game.place_letter(0, 0, 'S')
+        self.game.place_letter(1, 1, 'O')
+        self.game.place_letter(2, 2, 'S')
+        self.assertTrue(self.game.check_sos(1, 1))
+
+    def test_no_sos(self):
+        self.game.place_letter(0, 0, 'S')
+        self.game.place_letter(0, 1, 'O')
+        self.game.place_letter(0, 2, 'O')
+        self.assertFalse(self.game.check_sos(0, 1))
+
+    def test_is_board_full(self):
+        for i in range(5):
+            for j in range(5):
+                self.game.place_letter(i, j, 'S')
+        self.assertTrue(self.game.is_board_full())
+
+    def test_reset_game(self):
+        self.game.place_letter(0, 0, 'S')
+        self.game.blue_score = 3
+        self.game.red_score = 2
+        self.game.game_over = True
+        self.game.current_player = "Red"
+        
+        self.game.reset_game()
+        
+        self.assertEqual(self.game.blue_score, 0)
+        self.assertEqual(self.game.red_score, 0)
+        self.assertFalse(self.game.game_over)
+        self.assertEqual(self.game.current_player, "Blue")
+        self.assertEqual(self.game.board[0][0], '')
+
+if __name__ == '__main__':
+    unittest.main()
